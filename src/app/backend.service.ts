@@ -16,7 +16,7 @@ export type User = {
 export type Task = {
   id: number;
   description: string;
-  assigneeId: number;
+  assigneeId: null | number;
   completed: boolean;
 };
 
