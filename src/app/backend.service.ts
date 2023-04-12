@@ -21,7 +21,7 @@ export class BackendService {
 		{ id: 4, name: "Mr. Krabs", image: "./assets/mr-krabs.png" },
 		{ id: 5, name: "Sandy Cheecks", image: "./assets/sandy.png" },
 		{ id: 6, name: "Plankton", image: "./assets/plankton.png" },
-		{ id: 7, name: "Gary", image: "./assets/gary.png" },
+		{ id: 7, name: "Gary", image: "./assets/garry.png" },
 		{ id: 8, name: "Pearl", image: "./assets/pearl.png" },
 		{ id: 9, name: "Karen", image: "./assets/karen.png" },
 		{
@@ -46,7 +46,7 @@ export class BackendService {
 		{
 			id: 0,
 			description: "Take food order",
-			assigneeId: 2,
+			assigneeId: 1,
 			completed: true,
 		},
 		{
@@ -118,6 +118,7 @@ export class BackendService {
 	private findUserById = (id) => this.storedUsers.find((user) => user.id === +id);
 
 	tasks() {
+		console.log("tasks");
 		return of(this.storedTasks).pipe(delay(randomDelay()));
 	}
 
@@ -126,6 +127,7 @@ export class BackendService {
 	}
 
 	users() {
+		console.log("users");
 		return of(this.storedUsers).pipe(delay(randomDelay()));
 	}
 
@@ -140,6 +142,7 @@ export class BackendService {
 			assigneeId: payload.assigneeId,
 			completed: false,
 		};
+		console.log(newTask);
 
 		this.storedTasks = this.storedTasks.concat(newTask);
 

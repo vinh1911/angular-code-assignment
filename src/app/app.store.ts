@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { ComponentStore, tapResponse } from "@ngrx/component-store";
 import { Observable } from "rxjs";
-import { exhaustMap, mergeMap, switchMap, tap } from "rxjs/operators";
-import { SortOrder, Task, TaskFilter, User } from "src/app/shared/interface";
+import { mergeMap, switchMap, tap } from "rxjs/operators";
+import { SortOrder, Task, TaskFilter, User } from "./shared/interface";
 import { BackendService } from "./backend.service";
 
 export interface AppState {
@@ -37,7 +37,7 @@ export class AppStore extends ComponentStore<AppState> {
 
 	readonly tasksWithAssignee$: Observable<Task[]> = this.select(this.tasks$, this.users$, (tasks, users) => {
 		return tasks.map((task) => {
-			if (task.assigneeId) {
+			if (task.assigneeId && users.length > 0) {
 				const assignee = users.find((user) => user.id === task.assigneeId);
 				return {
 					...task,
@@ -62,16 +62,7 @@ export class AppStore extends ComponentStore<AppState> {
 
 	readonly error$: Observable<Error> = this.select((state) => state.error);
 
-	readonly vm$: Observable<{
-		tasks: Task[];
-		users: User[];
-		selectedTask: Task;
-		filter: TaskFilter;
-		sortOrder: SortOrder;
-		query: string;
-		isLoading: boolean;
-		error: any;
-	}> = this.select(
+	readonly vm$ = this.select(
 		this.tasksWithAssignee$,
 		this.users$,
 		this.selectedTask$,
@@ -80,25 +71,23 @@ export class AppStore extends ComponentStore<AppState> {
 		this.query$,
 		this.isLoading$,
 		this.error$,
-		(tasks, users, selectedTask, filter, sortOrder, query, isLoading, error) => {
-			return {
-				tasks: this.filterTasks(tasks, filter, query, sortOrder),
-				users,
-				selectedTask,
-				filter,
-				sortOrder,
-				query,
-				isLoading,
-				error,
-			};
-		}
+		(tasks, users, selectedTask, filter, sortOrder, query, isLoading, error) => ({
+			tasks: this.filterTasks(tasks, filter, query, sortOrder),
+			users,
+			selectedTask,
+			filter,
+			sortOrder,
+			query,
+			isLoading,
+			error,
+		})
 	);
 
 	private filterTasks(tasks: Task[], filter: TaskFilter, query: string, sortOrder: SortOrder): Task[] {
 		return (
 			tasks
 				// filter by query
-				.filter((task) => task.description.includes(query))
+				.filter((task) => task.description.toLowerCase().includes(query.toLowerCase()))
 				// filter by filter
 				.filter((task) => {
 					switch (filter) {
@@ -122,10 +111,13 @@ export class AppStore extends ComponentStore<AppState> {
 		);
 	}
 
-	readonly selectTask = this.updater((state, task: Task) => ({
-		...state,
-		selectedTask: task,
-	}));
+	readonly selectTask = this.updater((state, id: number) => {
+		const selectedTask = state.tasks.find((task) => task.id === id);
+		return {
+			...state,
+			selectedTask,
+		};
+	});
 
 	readonly selectFilter = this.updater((state, filter: TaskFilter) => ({
 		...state,
@@ -140,6 +132,11 @@ export class AppStore extends ComponentStore<AppState> {
 	readonly setQuery = this.updater((state, query: string) => ({
 		...state,
 		query,
+	}));
+
+	readonly clearSelectedTask = this.updater((state) => ({
+		...state,
+		selectedTask: null,
 	}));
 
 	readonly loadUsers = this.effect<void>(($) =>

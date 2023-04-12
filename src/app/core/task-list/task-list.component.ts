@@ -1,5 +1,9 @@
+import { componentFactoryName } from "@angular/compiler";
 import { Component, OnInit } from "@angular/core";
-import { BackendService } from "src/app/backend.service";
+import { MatDialog } from "@angular/material/dialog";
+import { AppStore } from "src/app/app.store";
+import { SortOrder, TaskFilter, User } from "src/app/shared/interface";
+import { AddTaskComponent } from "../add-task/add-task.component";
 
 @Component({
 	selector: "app-task-list",
@@ -7,13 +11,49 @@ import { BackendService } from "src/app/backend.service";
 	styleUrls: ["./task-list.component.scss"],
 })
 export class TaskListComponent implements OnInit {
-	tasks = this.backend.tasks();
+	constructor(private store: AppStore, public dialog: MatDialog) {}
+	vm$ = this.store.vm$;
+	SortOrder = SortOrder;
+	TaskFilter = TaskFilter;
+	searchBox: string;
 
-	constructor(private backend: BackendService) {}
-
-	ngOnInit(): void {}
+	ngOnInit(): void {
+		this.vm$.subscribe((res) => console.log(res));
+	}
 
 	toggleCompletion(taskId: number, completed: boolean) {
-		this.backend.complete(taskId, true);
+		completed = !completed;
+		this.store.completeTask({ taskId, completed });
+	}
+
+	onChange(value: string) {
+		console.log(value);
+		this.store.setQuery(value);
+	}
+
+	toggleSort(sortOrder: SortOrder) {
+		sortOrder = sortOrder === SortOrder.Newest ? SortOrder.Oldest : SortOrder.Newest;
+		this.store.selectSortOrder(sortOrder);
+	}
+
+	onToggleGroupChange(value) {
+		this.store.selectFilter(value);
+	}
+
+	openAddDialog(users: User[]) {
+		const dialogRef = this.dialog.open(AddTaskComponent, {
+			data: users,
+		});
+
+		dialogRef.afterClosed().subscribe((result) => {
+			if (result) {
+				console.log(result);
+				this.store.newTask({ description: result.description, assigneeId: result.selectedUser });
+			}
+		});
+	}
+
+	selectTask(taskId: number) {
+		this.store.selectTask(taskId);
 	}
 }

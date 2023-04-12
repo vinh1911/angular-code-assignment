@@ -14,6 +14,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { PageNotFoundComponent } from './layout/page-not-found/page-not-found.component';
 import { RoutingModule } from './routing.module';
 import { SidenavService } from './layout/sidenav.service';
+import { AddTaskComponent } from './core/add-task/add-task.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { SidenavService } from './layout/sidenav.service';
     UserDetailComponent,
     HeaderComponent,
     MenuComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    AddTaskComponent
   ],
   imports: [
     BrowserModule,
