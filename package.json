@@ -13,6 +13,7 @@
     "@angular/platform-browser": "12.2.3",
     "@angular/platform-browser-dynamic": "12.2.3",
     "@angular/router": "12.2.3",
+    "@ngrx/component-store": "^12.5.1",
     "@ngrx/store": "^12.5.1",
     "core-js": "2.6.2",
     "rxjs": "^6.6.7",

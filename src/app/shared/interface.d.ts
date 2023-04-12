@@ -7,6 +7,19 @@ export interface User {
 export interface Task {
 	id: number;
 	description: string;
-	assigneeId?: number;
 	completed: boolean;
+	assigneeId?: number;
+	assigneeName?: string;
+	assigneeImage?: string;
+}
+
+export enum TaskFilter {
+	All,
+	Completed,
+	Pending
+}
+
+export enum SortOrder {
+	Newest,
+	Oldest
 }
