@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Observable } from "rxjs";
-import { BackendService, Task } from "src/app/backend.service";
+import { BackendService} from "src/app/backend.service";
 import { Location } from "@angular/common";
+import { Task } from "src/app/shared/interface";
 
 @Component({
 	selector: "app-task-detail",
