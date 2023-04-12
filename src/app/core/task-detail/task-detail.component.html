@@ -1,1 +1,21 @@
-<p>task-detail works!</p>
+<div class="sub-nav">
+	<button mat-stroked-button (click)="goBack()">
+		<mat-icon>arrow_back</mat-icon>
+	</button>
+</div>
+<div *ngIf="task | async as t">
+	<div class="task-detail-container">
+		<div class="header">
+			<h2>{{ t.description }}</h2>
+			<button mat-flat-button color="primary" matTooltip="Edit task">
+				<mat-icon>edit</mat-icon>
+			</button>
+		</div>
+		<div class="task">
+			<p> ID: {{ t.id }} </p>
+			<p> Description: {{ t.description }} </p>
+			<p> Status: {{ t.completed ? "Completed" : "Pending" }} </p>
+			<p> Assigned to: {{ t.assigneeId }} </p>
+		</div>
+	</div>
+</div>

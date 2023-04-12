@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { BackendService } from 'src/app/backend.service';
+import { Component, OnInit } from "@angular/core";
+import { BackendService } from "src/app/backend.service";
 
 @Component({
-  selector: 'app-task-list',
-  templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.scss']
+	selector: "app-task-list",
+	templateUrl: "./task-list.component.html",
+	styleUrls: ["./task-list.component.scss"],
 })
 export class TaskListComponent implements OnInit {
-  tasks = this.backend.tasks();
+	tasks = this.backend.tasks();
 
-  constructor(private backend: BackendService) {}
+	constructor(private backend: BackendService) {}
 
-  ngOnInit(): void {
-  }
+	ngOnInit(): void {}
 
+	toggleCompletion(taskId: number, completed: boolean) {
+		this.backend.complete(taskId, true);
+	}
 }

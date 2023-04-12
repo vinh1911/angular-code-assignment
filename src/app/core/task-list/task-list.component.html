@@ -1,5 +1,45 @@
-<h2>Tasks</h2>
+<!-- <h2>Tasks</h2>
 
 <ul>
   <li *ngFor="let t of tasks | async">Task {{ t.id }}: {{ t.description }}</li>
-</ul>
+</ul> -->
+
+<div class="sub-nav">
+	<mat-button-toggle-group class="toggle-group" #group="matButtonToggleGroup">
+		<mat-button-toggle value="all">All</mat-button-toggle>
+		<mat-button-toggle value="active">Pending</mat-button-toggle>
+		<mat-button-toggle value="completed">Completed</mat-button-toggle>
+	</mat-button-toggle-group>
+	<mat-form-field class="search-bar" appearance="outline">
+		<mat-label>Search</mat-label>
+		<input matInput />
+		<mat-icon matPrefix>search</mat-icon>
+	</mat-form-field>
+</div>
+<div class="task-list-container">
+	<div class="header">
+		<button mat-stroked-button>
+			Sort
+			<mat-icon>keyboard_arrow_down</mat-icon>
+		</button>
+		<button mat-flat-button color="primary" matTooltip="Add new task">
+			<mat-icon>add</mat-icon>
+		</button>
+	</div>
+	<div *ngFor="let t of tasks | async" class="task">
+		<div class="left-side">
+			<button mat-icon-button (click)="toggleCompletion(t.id, t.completed)" matTooltip="Toggle completion">
+				<mat-icon *ngIf="t.completed" style="color: green"
+					>done</mat-icon
+				>
+				<mat-icon *ngIf="!t.completed" style="color: red"
+					>priority_high</mat-icon
+				>
+			</button>
+			<h3 routerLink="/tasks/{{t.id}}">{{ t.description }}</h3>
+		</div>
+		<div class="right-side">
+			<span class="assigned">{{ t.assigneeId }}</span>
+		</div>
+	</div>
+</div>
