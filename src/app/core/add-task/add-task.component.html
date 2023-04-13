@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Add new task</h2>
+<h2 mat-dialog-title>{{editMode ? 'Edit': 'Add'}} new task</h2>
 <mat-dialog-content class="mat-typography">
 	<mat-form-field appearance="outline">
 		<mat-label>Enter task description</mat-label>
@@ -7,9 +7,9 @@
 
 	<mat-form-field appearance="outline">
 		<mat-label>Assign user</mat-label>
-		<mat-select [(ngModel)]="selectedUser" name="u">
+		<mat-select [(ngModel)]="selectedUser">
 			<mat-option>---</mat-option>
-			<mat-option *ngFor="let u of data" [value]="u.id">
+			<mat-option *ngFor="let u of data.users" [value]="u.id">
 				{{ u.name }}
 			</mat-option>
 		</mat-select>
@@ -17,5 +17,5 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
 	<button mat-stroked-button (click)="onNoClick()">Cancel</button>
-	<button mat-flat-button [mat-dialog-close]="{description, selectedUser}" color="primary" [disabled]="!description">Create</button>
+	<button mat-flat-button [mat-dialog-close]="{description, selectedUser}" color="primary" [disabled]="!description">Confirm</button>
 </mat-dialog-actions>

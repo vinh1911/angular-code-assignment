@@ -8,11 +8,13 @@ import { User } from "src/app/shared/interface";
 	styleUrls: ["./add-task.component.scss"],
 })
 export class AddTaskComponent implements OnInit {
-	constructor(public dialogRef: MatDialogRef<AddTaskComponent>, @Inject(MAT_DIALOG_DATA) public data: User[]) {}
-	selectedUser: number;
-	description: string;
+	constructor(public dialogRef: MatDialogRef<AddTaskComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+	selectedUser = this.data.assigneeId ? this.data.assigneeId : null;
+	description = this.data.description ? this.data.description : null;
+	editMode = this.data.description ? true : false;
 
-	ngOnInit(): void {}
+	ngOnInit(): void {
+	}
 
 	onNoClick(): void {
 		this.dialogRef.close();

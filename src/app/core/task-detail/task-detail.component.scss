@@ -11,12 +11,27 @@
 	min-height: 64px;
 	.header {
 		display: flex;
-		justify-content: space-between;
+		// justify-content: space-between;
 		align-items: center;
 		padding: 16px;
         h2 {
-            margin-bottom: 0;
+            margin: 0 16px;
         }
+		h3 {
+			margin: 0 8px 0 16px;
+			span {
+				margin-left: 4px;
+				font-weight: 500;
+			}
+		}
+		img {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+		}
+		.edit-button {
+			margin-left: auto;
+		}
 	}
 	.task {
 		padding: 16px;

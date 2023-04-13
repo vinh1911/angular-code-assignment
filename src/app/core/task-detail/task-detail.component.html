@@ -7,8 +7,29 @@
 	<div *ngIf="vm.selectedTask">
 		<div class="task-detail-container">
 			<div class="header">
+				<button
+					mat-stroked-button
+					(click)="toggleCompletion(vm.selectedTask.id)"
+					matTooltip="Toggle completion"
+				>
+					<mat-icon *ngIf="vm.selectedTask.completed" style="color: green">done</mat-icon>
+					<mat-icon *ngIf="!vm.selectedTask.completed" style="color: red">priority_high</mat-icon>
+				</button>
 				<h2>{{ vm.selectedTask.description }}</h2>
-				<button mat-flat-button color="primary" matTooltip="Edit task">
+				<mat-divider vertical style="height: 36px"></mat-divider>
+				<h3>
+					Assigned to:<span>{{ vm.selectedTask.assigneeName }}</span>
+				</h3>
+				<img [src]="vm.selectedTask.assigneeImage" />
+				<button
+					mat-flat-button
+					color="primary"
+					matTooltip="Edit task"
+					class="edit-button"
+					(click)="
+						openEditDialog(vm.selectedTask.id, vm.selectedTask.description, vm.selectedTask.assigneeId, vm.users)
+					"
+				>
 					<mat-icon>edit</mat-icon>
 				</button>
 			</div>
@@ -16,7 +37,8 @@
 				<p>ID: {{ vm.selectedTask.id }}</p>
 				<p>Description: {{ vm.selectedTask.description }}</p>
 				<p>Status: {{ vm.selectedTask.completed ? "Completed" : "Pending" }}</p>
-				<p>Assigned to: {{ vm.selectedTask.assigneeId }}</p>
+				<p>Assignee Id: {{ vm.selectedTask.assigneeId }}</p>
+				<p>Assignee Name: {{ vm.selectedTask.assigneeName }}</p>
 			</div>
 		</div>
 	</div>

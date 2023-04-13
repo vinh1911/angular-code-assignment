@@ -1,14 +1,14 @@
 import { Injectable } from "@angular/core";
 import { ComponentStore, tapResponse } from "@ngrx/component-store";
 import { Observable } from "rxjs";
-import { mergeMap, switchMap, tap } from "rxjs/operators";
+import { mergeMap, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { SortOrder, Task, TaskFilter, User } from "./shared/interface";
 import { BackendService } from "./backend.service";
 
 export interface AppState {
 	tasks: Task[];
 	users: User[];
-	selectedTask: Task;
+	selectedTaskId: number;
 	filter: TaskFilter;
 	sortOrder: SortOrder;
 	query: string;
@@ -22,7 +22,7 @@ export class AppStore extends ComponentStore<AppState> {
 		super({
 			tasks: [],
 			users: [],
-			selectedTask: null,
+			selectedTaskId: null,
 			filter: TaskFilter.All,
 			sortOrder: SortOrder.Newest,
 			query: "",
@@ -50,7 +50,7 @@ export class AppStore extends ComponentStore<AppState> {
 		});
 	});
 
-	readonly selectedTask$: Observable<Task> = this.select((state) => state.selectedTask);
+	readonly selectedTaskId$: Observable<number> = this.select((state) => state.selectedTaskId);
 
 	readonly filter$: Observable<TaskFilter> = this.select((state) => state.filter);
 
@@ -65,16 +65,16 @@ export class AppStore extends ComponentStore<AppState> {
 	readonly vm$ = this.select(
 		this.tasksWithAssignee$,
 		this.users$,
-		this.selectedTask$,
+		this.selectedTaskId$,
 		this.filter$,
 		this.sortOrder$,
 		this.query$,
 		this.isLoading$,
 		this.error$,
-		(tasks, users, selectedTask, filter, sortOrder, query, isLoading, error) => ({
+		(tasks, users, selectedTaskId, filter, sortOrder, query, isLoading, error) => ({
 			tasks: this.filterTasks(tasks, filter, query, sortOrder),
 			users,
-			selectedTask,
+			selectedTask: selectedTaskId ? tasks.find((task) => task.id === selectedTaskId) : null,
 			filter,
 			sortOrder,
 			query,
@@ -84,40 +84,27 @@ export class AppStore extends ComponentStore<AppState> {
 	);
 
 	private filterTasks(tasks: Task[], filter: TaskFilter, query: string, sortOrder: SortOrder): Task[] {
-		return (
-			tasks
-				// filter by query
-				.filter((task) => task.description.toLowerCase().includes(query.toLowerCase()))
-				// filter by filter
-				.filter((task) => {
-					switch (filter) {
-						case TaskFilter.All:
-							return true;
-						case TaskFilter.Completed:
-							return task.completed;
-						case TaskFilter.Pending:
-							return !task.completed;
-					}
-				})
-				// sort by sortOrder
-				.sort((a, b) => {
-					switch (sortOrder) {
-						case SortOrder.Newest:
-							return b.id - a.id;
-						case SortOrder.Oldest:
-							return a.id - b.id;
-					}
-				})
-		);
+		return tasks
+			.filter((task) => task.description.toLowerCase().includes(query.toLowerCase()))
+			.filter((task) => {
+				switch (filter) {
+					case TaskFilter.All:
+						return true;
+					case TaskFilter.Completed:
+						return task.completed;
+					case TaskFilter.Pending:
+						return !task.completed;
+				}
+			})
+			.sort((a, b) => {
+				switch (sortOrder) {
+					case SortOrder.Newest:
+						return b.id - a.id;
+					case SortOrder.Oldest:
+						return a.id - b.id;
+				}
+			});
 	}
-
-	readonly selectTask = this.updater((state, id: number) => {
-		const selectedTask = state.tasks.find((task) => task.id === id);
-		return {
-			...state,
-			selectedTask,
-		};
-	});
 
 	readonly selectFilter = this.updater((state, filter: TaskFilter) => ({
 		...state,
@@ -134,9 +121,14 @@ export class AppStore extends ComponentStore<AppState> {
 		query,
 	}));
 
-	readonly clearSelectedTask = this.updater((state) => ({
+	readonly selectTaskId = this.updater((state, taskId: number) => ({
 		...state,
-		selectedTask: null,
+		selectedTaskId: taskId,
+	}));
+
+	readonly clearSelectedTaskId = this.updater((state) => ({
+		...state,
+		selectedTaskId: null,
 	}));
 
 	readonly loadUsers = this.effect<void>(($) =>
@@ -166,7 +158,7 @@ export class AppStore extends ComponentStore<AppState> {
 	readonly newTask = this.effect<{ description: string; assigneeId: number }>(($) =>
 		$.pipe(
 			tap(() => this.patchState({ isLoading: true })),
-			mergeMap((payload) => this.backend.newTask(payload)),
+			switchMap((payload) => this.backend.newTask(payload)),
 			tapResponse(
 				(task) => this.patchState({ tasks: [...this.get().tasks, task] }),
 				(error) => this.patchState({ error })
@@ -178,7 +170,7 @@ export class AppStore extends ComponentStore<AppState> {
 	readonly assignTask = this.effect<{ taskId: number; userId: number }>(($) =>
 		$.pipe(
 			tap(() => this.patchState({ isLoading: true })),
-			mergeMap((payload) => this.backend.assign(payload.taskId, payload.userId)),
+			switchMap((payload) => this.backend.assign(payload.taskId, payload.userId)),
 			tapResponse(
 				(task) => {
 					this.patchState({
@@ -191,10 +183,34 @@ export class AppStore extends ComponentStore<AppState> {
 		)
 	);
 
-	readonly completeTask = this.effect<{ taskId: number; completed: boolean }>(($) =>
+	readonly toggleCompletion = this.effect<number>(($) =>
 		$.pipe(
 			tap(() => this.patchState({ isLoading: true })),
-			mergeMap((payload) => this.backend.complete(payload.taskId, payload.completed)),
+			switchMap((payload) => {
+				const task = this.get().tasks.find((task) => task.id === payload);
+				return this.backend.complete(payload, !task.completed);
+			}),
+			tapResponse(
+				(task) => {
+					this.patchState({
+						tasks: this.get().tasks.map((t) => (t.id === task.id ? task : t)),
+					});
+				},
+				(error) => this.patchState({ error })
+			),
+			tap(() => this.patchState({ isLoading: false }))
+		)
+	);
+
+	readonly updateTask = this.effect<{ taskId: number; description: string; assigneeId: number }>(($) =>
+		$.pipe(
+			tap(() => this.patchState({ isLoading: true })),
+			switchMap((payload) =>
+				this.backend.update(payload.taskId, {
+					description: payload.description,
+					assigneeId: payload.assigneeId,
+				})
+			),
 			tapResponse(
 				(task) => {
 					this.patchState({

@@ -36,7 +36,7 @@
 		</div>
 		<div *ngFor="let t of vm.tasks" class="task">
 			<div class="left-side">
-				<button mat-icon-button (click)="toggleCompletion(t.id, t.completed)" matTooltip="Toggle completion">
+				<button mat-icon-button (click)="toggleCompletion(t.id)" matTooltip="Toggle completion">
 					<mat-icon *ngIf="t.completed" style="color: green">done</mat-icon>
 					<mat-icon *ngIf="!t.completed" style="color: red">priority_high</mat-icon>
 				</button>

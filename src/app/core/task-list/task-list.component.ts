@@ -17,17 +17,13 @@ export class TaskListComponent implements OnInit {
 	TaskFilter = TaskFilter;
 	searchBox: string;
 
-	ngOnInit(): void {
-		this.vm$.subscribe((res) => console.log(res));
-	}
+	ngOnInit(): void {}
 
-	toggleCompletion(taskId: number, completed: boolean) {
-		completed = !completed;
-		this.store.completeTask({ taskId, completed });
+	toggleCompletion(taskId: number) {
+		this.store.toggleCompletion(taskId);
 	}
 
 	onChange(value: string) {
-		console.log(value);
 		this.store.setQuery(value);
 	}
 
@@ -47,13 +43,12 @@ export class TaskListComponent implements OnInit {
 
 		dialogRef.afterClosed().subscribe((result) => {
 			if (result) {
-				console.log(result);
 				this.store.newTask({ description: result.description, assigneeId: result.selectedUser });
 			}
 		});
 	}
 
 	selectTask(taskId: number) {
-		this.store.selectTask(taskId);
+		this.store.selectTaskId(taskId);
 	}
 }

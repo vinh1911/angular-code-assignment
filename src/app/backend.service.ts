@@ -44,12 +44,6 @@ export class BackendService {
 
 	storedTasks: Task[] = [
 		{
-			id: 0,
-			description: "Take food order",
-			assigneeId: 1,
-			completed: true,
-		},
-		{
 			id: 1,
 			description: "Clean the kitchen",
 			assigneeId: 3,
@@ -109,6 +103,12 @@ export class BackendService {
 			assigneeId: 12,
 			completed: false,
 		},
+		{
+			id: 11,
+			description: "Take food order",
+			assigneeId: 1,
+			completed: true,
+		},
 	];
 
 	lastId = 10;
@@ -118,7 +118,6 @@ export class BackendService {
 	private findUserById = (id) => this.storedUsers.find((user) => user.id === +id);
 
 	tasks() {
-		console.log("tasks");
 		return of(this.storedTasks).pipe(delay(randomDelay()));
 	}
 
@@ -127,7 +126,6 @@ export class BackendService {
 	}
 
 	users() {
-		console.log("users");
 		return of(this.storedUsers).pipe(delay(randomDelay()));
 	}
 
@@ -142,7 +140,6 @@ export class BackendService {
 			assigneeId: payload.assigneeId,
 			completed: false,
 		};
-		console.log(newTask);
 
 		this.storedTasks = this.storedTasks.concat(newTask);
 

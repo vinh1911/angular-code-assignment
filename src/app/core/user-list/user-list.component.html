@@ -1,5 +1,6 @@
-<h2>Users</h2>
-
-<ul>
-  <li *ngFor="let u of users | async">User {{ u.id }}: {{ u.name }}</li>
-</ul>
+<div class="container">
+	<div *ngFor="let u of users | async" class="user">
+		<img [src]="u.image" />
+		<div class="name">{{ u.name }}</div>
+	</div>
+</div>
