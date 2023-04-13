@@ -8,6 +8,7 @@ import { AppStore } from "./app.store";
 	providers: [AppStore],
 })
 export class AppComponent implements OnInit {
+	isLoading$ = this.store.isLoading$;
 	constructor(private readonly store: AppStore) {}
 
 	ngOnInit(): void {

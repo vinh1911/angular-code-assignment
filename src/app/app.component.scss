@@ -3,3 +3,8 @@
 	margin-right: auto;
 	width: 1080px;
 }
+mat-progress-bar {
+	position: fixed;
+	bottom: 0;
+	z-index: 100;
+}
