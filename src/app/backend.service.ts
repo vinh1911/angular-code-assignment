@@ -111,7 +111,7 @@ export class BackendService {
 		},
 	];
 
-	lastId = 10;
+	lastId = 11;
 
 	private findTaskById = (id) => this.storedTasks.find((task) => task.id === +id);
 

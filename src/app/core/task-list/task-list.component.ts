@@ -37,8 +37,11 @@ export class TaskListComponent implements OnInit {
 	}
 
 	openAddDialog(users: User[]) {
+		console.log(users);
 		const dialogRef = this.dialog.open(AddTaskComponent, {
-			data: users,
+			data: {
+				users
+			}
 		});
 
 		dialogRef.afterClosed().subscribe((result) => {
