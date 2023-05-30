@@ -1,3 +1,5 @@
+https://mayo-angular-assignment.vercel.app/
+
 ## Tasks managing application
 
 Build a task managing app, where the user can add, filter, assign, and complete tasks.
